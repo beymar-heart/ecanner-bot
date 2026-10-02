@@ -65,6 +65,7 @@ def procesar_con_ia(image_path, pdf_path):
                 "En este caso solo toma en cuenta el tema 4 del pdf. "
                 "Sé extremadamente directo, conciso y breve (máximo dos o tres líneas), optimizado para leerse rápido en un reloj. "
                 "no cambies palabras ni parafrasees nada, debe ser tal cual esta escrito en el pdf, ve directo a la respuesta para que salga en 2 lineas o menos"
+                "si hay mas de una pregunta, separalos con numeros en su orden respectivo: 1..... 2.... 3...."
             )
 
             print("Generando respuesta con Gemini...")
