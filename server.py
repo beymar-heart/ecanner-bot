@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from flask import Flask, request
 from google import genai
-import requests  # Para enviar la notificación a tu celular
+import requests
 
 app = Flask(__name__)
 
@@ -21,10 +21,10 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 # Directorio y rutas de archivos locales
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__))
 IMAGE_PATH = os.path.join(UPLOAD_FOLDER, "PREVIO.jpg")
-PDF_TEMARIO_PATH = os.path.join(UPLOAD_FOLDER, "TEMFISICA.pdf")  # Tu PDF de referencia
+PDF_TEMARIO_PATH = os.path.join(UPLOAD_FOLDER, "TEMFISICA.pdf")
 
 def mejorar_imagen_opencv(image_path):
-    """Aplica CLAHE con OpenCV para mejorar el contraste de fotos movidas o de costado"""
+    """Aplica CLAHE con OpenCV para mejorar el contraste"""
     try:
         img = cv2.imread(image_path)
         if img is None:
@@ -38,7 +38,7 @@ def mejorar_imagen_opencv(image_path):
     return image_path
 
 def enviar_notificacion_telegram(mensaje):
-    """Envía la respuesta de la IA a tu Telegram para que tu celular y reloj vibren"""
+    """Envía la respuesta de la IA a tu Telegram"""
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
         payload = {
@@ -65,7 +65,6 @@ def procesar_con_ia(image_path, pdf_path):
                 "En este caso solo toma en cuenta el tema 4 del pdf. "
                 "Sé extremadamente directo, conciso y breve (máximo dos o tres líneas), optimizado para leerse rápido en un reloj. "
                 "no cambies palabras ni parafrasees nada, debe ser tal cual esta escrito en el pdf, ve directo a la respuesta para que salga en 2 lineas o menos"
-                "si hay mas de una pregunta, separalos con numeros en su orden respectivo: 1..... 2.... 3...."
             )
 
             print("Generando respuesta con Gemini...")
@@ -76,7 +75,6 @@ def procesar_con_ia(image_path, pdf_path):
 
             respuesta_texto = response.text
             
-            # Limpiar archivos de los servidores de Google
             if image_file: client.files.delete(name=image_file.name)
             if pdf_file: client.files.delete(name=pdf_file.name)
 
@@ -84,20 +82,18 @@ def procesar_con_ia(image_path, pdf_path):
 
         except Exception as e:
             print(f"Error en intento {intento+1}: {e}")
-            # Intentar limpiar archivos si quedaron colgados
             try:
                 if image_file: client.files.delete(name=image_file.name)
                 if pdf_file: client.files.delete(name=pdf_file.name)
             except:
                 pass
 
-            # Si es un error 503 (servidores saturados), reintentar automáticamente
             if "503" in str(e) or "UNAVAILABLE" in str(e):
                 if intento < max_intentos - 1:
                     print("Servidores saturados (503). Reintentando en 1.5 segundos...")
                     time.sleep(1.5)
                     continue
-            break  # Si es otro tipo de error, rompemos el ciclo
+            break
 
     return None
 
@@ -108,20 +104,16 @@ def upload_image():
         if not image_data:
             return "No image data received", 400
 
-        # Guardar la foto que mandó el ESP32
         with open(IMAGE_PATH, "wb") as f:
             f.write(image_data)
 
-        print(f"¡Foto recibida del ESP32! Tamaño: {len(image_data)} bytes")
-
-        # Mejorar con OpenCV
+        print(f"¡Foto recibida! Tamaño: {len(image_data)} bytes")
         mejorar_imagen_opencv(IMAGE_PATH)
 
         if not os.path.exists(PDF_TEMARIO_PATH):
-            print("Error: Falta el archivo 'temario.pdf' en la carpeta.")
+            print("Error: Falta el archivo 'TEMFISICA.pdf'.")
             return "Temario missing", 500
 
-        # Procesar con la API de Google (con reintentos automáticos si hay 503)
         respuesta_final = procesar_con_ia(IMAGE_PATH, PDF_TEMARIO_PATH)
 
         if respuesta_final:
@@ -135,5 +127,7 @@ def upload_image():
         print(f"Error en el servidor: {e}")
         return "Internal Server Error", 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+if __name__ == '_main_':
+    # CAMBIO CLAVE PARA LA NUBE: Render asigna un puerto automático por seguridad
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
