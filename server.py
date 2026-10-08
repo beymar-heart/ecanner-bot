@@ -9,7 +9,7 @@ import requests
 app = Flask(__name__)
 
 # --- CONFIGURACIÓN DE CREDENCIALES ---
-GEMINI_API_KEY = "AQ.Ab8RN6LA8DOI9LUvEXTYRhI7O1GxkSXThW6MmDWWA6yDzxLb4w"
+GEMINI_API_KEY = "AQ.Ab8RN6JLXuYtkFbaYSChVIuQCvas1UoVteRG1IVoCJGtpXvWrg"
 
 # Configuración para Telegram
 TELEGRAM_BOT_TOKEN = "8970804418:AAHpHuksoUPiqGI2acd1b7jhNHEdmbeWLl0"
@@ -63,9 +63,10 @@ def procesar_con_ia(image_path, pdf_path):
                 "Analiza las preguntas de esta hoja de examen. "
                 "Usa estrictamente el contenido del PDF del temario proporcionado para dar la respuesta correcta. "
                 "En este caso solo toma en cuenta el tema 4 del pdf. "
-                "Sé extremadamente directo, conciso y breve (máximo dos o tres líneas), optimizado para leerse rápido en un reloj. "
+                "Sé extremadamente directo, conciso y breve (máximo una o dos líneas), optimizado para leerse rápido en un reloj. "
                 "no cambies palabras ni parafrasees nada, debe ser tal cual esta escrito en el pdf, ve directo a la respuesta para que salga en 2 lineas o menos"
-            )
+                "REGLA ABSOLUTA: CERO EXPLICACIONES, CERO TEXTO DEMAS, SOLO LA RESPUESTA CON UN NUMERO INDICANDO EL NUMERO DE PREGUNTA"
+            )  
 
             print("Generando respuesta con Gemini...")
             response = client.models.generate_content(
@@ -127,6 +128,10 @@ def upload_image():
         print(f"Error en el servidor: {e}")
         return "Internal Server Error", 500
 
+if __name__ == '__main__':
+    # CAMBIO CLAVE PARA LA NUBE: Render asigna un puerto automático por seguridad
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
 if __name__ == '_main_':
     # CAMBIO CLAVE PARA LA NUBE: Render asigna un puerto automático por seguridad
     port = int(os.environ.get('PORT', 5000))
