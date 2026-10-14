@@ -8,6 +8,16 @@ import requests
 
 app = Flask(__name__)
 
+# --- CONFIGURACIÓN PARA DEPURAR ERRORES 500 ---
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # Límite de 50 MB para la subida de archivos
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    # Este mensaje aparecerá en los logs si la foto es demasiado grande
+    app.logger.error("ERROR 413: La imagen es demasiado grande. Límite excedido.")
+    return "La imagen excede el tamaño permitido", 413
+# --- FIN DE LA CONFIGURACIÓN ---
+
 # --- CONFIGURACIÓN DE CREDENCIALES ---
 GEMINI_API_KEY = "AQ.Ab8RN6JLXuYtkFbaYSChVIuQCvas1UoVteRG1IVoCJGtpXvWrg"
 
