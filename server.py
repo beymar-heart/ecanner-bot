@@ -98,8 +98,13 @@ def procesar_con_ia(image_path, pdf_path):
 
     return None
 
+@app.route('/')
+def home():
+    return "Server funcionando v2 - " + str(time.time())
+
 @app.route('/upload', methods=['POST'])
 def upload_image():
+    print(">>> ENTRO A UPLOAD_IMAGE <<<")
     try:
         image_data = request.get_data()
         if not image_data:
