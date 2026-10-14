@@ -70,7 +70,7 @@ def procesar_con_ia(image_path, pdf_path):
 
             print("Generando respuesta con Gemini...")
             response = client.models.generate_content(
-                model='gemini-3.8-flash',
+                model='gemini-2.5-flash',
                 contents=[image_file, pdf_file, prompt]
             )
 
