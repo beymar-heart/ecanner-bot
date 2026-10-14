@@ -125,12 +125,12 @@ def upload_image():
             return "Error procesando IA", 500
 
     except Exception as e:
-    import traceback
-    print("=" * 60)
-    print("ERROR COMPLETO:")
-    traceback.print_exc()
-    print("=" * 60)
-    return f"Error: {e}", 500
+            import traceback
+            print("=" * 60)
+            print("ERROR COMPLETO:")
+            traceback.print_exc()
+            print("=" * 60)
+            return f"Error: {e}", 500
 
 if __name__ == '__main__':
     # CAMBIO CLAVE PARA LA NUBE: Render asigna un puerto automático por seguridad
